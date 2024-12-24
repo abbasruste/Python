@@ -1,29 +1,26 @@
-# VTISearch - VirusTotal Intelligence Search
+VTISearch - VirusTotal Kəşfiyyat Axtarışı
+VTISearch VirusTotal Kəşfiyyat axtarış sorğusunu işlətmək üçün kiçik bir utilitdir. Sorğu, sənədləşmədə verilən güclü axtarış modifikatorlarını əhatə edə bilər ki, bu da təhdid araşdırması və ovçuluq əməliyyatlarını effektiv şəkildə həyata keçirməyə imkan verir.
 
-*VTISearch* is a small utility for running a VirusTotal Intelligence search query. A query can include powerful search modifiers (listed in the [documentation](https://support.virustotal.com/hc/en-us/articles/360001385897-File-search-modifiers)) that permit efficient threat research and hunting operations.
+Proqram VirusTotal API-nin v3 versiyasından istifadə edir. Xahiş edirik nəzərə alın ki, Kəşfiyyat Axtarışı (və proqramın digər funksiyalarının çoxu) üçün özəl API açarına ehtiyacınız var, yəni VirusTotal Enterprise xidmətinə girişiniz olmalıdır. API açarı ilk başladıqda tələb olunur və təhlükəsizlik səbəbi ilə sistemin açar saxlamağına (keyring) saxlanılır.
 
-The program leverages v3 of the VirusTotal API. Please note that for Intelligence Search (and most other features of the program), you need a *private* API key, i.e., access to VirusTotal Enterprise. The API key is requested upon the first start and saved to the keyring of the system for security reasons.
+Əvvəlcədən olaraq, VTISearch axtarış sorğusuna bağlı ilk 20 nümunə haqqında məlumat alır. Lakin -l (--limit) parametri ilə 300 nümunəyə qədər nəticələr tələb oluna bilər.
 
-By default, *VTISearch* retrieves information about the first 20 samples that are associated with the search query. However, results for up to 300 samples can be requested as well with the help of the `-l` (`--limit`) parameter.
+Məlumatlar nümunə şifrələrini (MD5, SHA1, SHA256 və varsa VirusTotal vhash oxşarlıq şifrəsi), artefaktın növü və ölçüsünü, təqdimat tarixlərini (ilk və sonuncu) və həmçinin aşkarlama statistikalarını əhatə edir.
 
-Information includes the list of sample hashes (MD5, SHA1, SHA256, and - if existing - the VirusTotal *vhash* similarity hash), the type and size of the artifact, dates of (first and last) submission, and also detection statistics.
+Əlavə detalları, məsələn, hər bir tədqiqatçı tərəfindən skan edilmiş nəticələri göstərmək üçün -v (verbose) parametri istifadə edilə bilər. Üç fərqli məlumat dərəcəsi dəstəklənir.
 
-Additional details, e.g., scanning results per vendor, can be displayed when speciying the verbose (`-v`) parameter. Up to three different verbosity levels are supported.
+VTISearch həmçinin əlaqəli nümunələri və davranış (dinamik analiz) hesabatlarını yükləməyə imkan verir. Dinamik analiz hesabatları avtomatik olaraq şəbəkə əsaslı Kompromis Göstəriciləri (IOC) çıxarmaq üçün təhlil edilir.
 
-*VTISearch* is capable of downloading the samples as well as behavioral (dynamic analysis) reports for an Intelligence search. Dynamic analysis reports are also automatically parsed in order to extract network-based Indicators of Compromise (IOCs). 
+--csv seçimi istifadə edildikdə, nəticələr CSV formatında ixrac edilə bilər və sonradan Maltego və ya digər qraf vizuallaşdırma proqramlarına idxal edilə bilər.
 
-When using the `--csv` option, results can be exported in CSV format for subsequent import in, e.g., *Maltego* or other graph visualization programs.
-
-
-## Features
-
-* Retrieves information for up to 300 artifacts (samples, domains, URLs) that are related to the search query.
-* Information includes meta data as well as detailed scanning and detection results upon request.
-* Supports the automatic download of associated samples and behavioral (dynamic analysis) reports.
-* Behavioral reports are automatically scanned for network-based Indicators of Compromise (IOCs).
-* Use of multiple workers to speed up operations.
-* All information is categorized in different sub-folders. Detailed logs facilitate post-processing.
-* Results can be exported in CSV format for subsequent relationship visualization with, e.g., Maltego.
+Xüsusiyyətlər
+Axtarış sorğusuna bağlı olan 300-ə qədər artefaktın (nümunə, domen, URL) məlumatlarını əldə edir.
+Məlumatlar meta məlumatları ilə yanaşı, tələb olunduqda ətraflı skanerləmə və aşkarlama nəticələrini də əhatə edir.
+Əlaqəli nümunələri və davranış (dinamik analiz) hesabatlarını avtomatik olaraq yükləyir.
+Davranış hesabatları avtomatik olaraq şəbəkə əsaslı Kompromis Göstəriciləri (IOC) üçün skan edilir.
+Əməliyyatları sürətləndirmək üçün çoxlu işçilərdən istifadə edir.
+Bütün məlumatlar müxtəlif alt qovluqlarda kateqoriyalara ayrılır. Ətraflı qeydlər sonrakı işləmələr üçün faydalıdır.
+Nəticələr CSV formatında ixrac edilə bilər və sonra əlaqələrin vizuallaşdırılması üçün, məsələn, Maltego proqramına idxal edilə bilər.
 
 
 ## Requirements and Installation
@@ -118,69 +115,55 @@ optional arguments:
   --csv                               If set, display results as comma-separated values.
 ```
 
-In the majority of cases, *VTISearch* will be executed with the `-q` (`--query`) parameter. This query is sent to VirusTotal via the `v3` API. Respective samples will not be downloaded by default. However, this procedure can be easily activated with the `-d` parameter.
+Əksər hallarda, VTISearch -q (--query) parametri ilə işlədiləcəkdir. Bu sorğu VirusTotal-ə v3 API vasitəsilə göndərilir. Əlaqəli nümunələr əvvəlcədən yüklənməyəcəkdir. Lakin bu prosedur -d parametri ilə asanlıqla aktivləşdirilə bilər.
 
 ```bash
 $ python3 vti_search.py -q "evil.exe" -d
 ```
 
-Rather than performing an Intelligence search, it is also possible processing a list of hashes that are stored in a file. As such, the program can be used as a quick sample downloader and IOC processor:
+Kəşfiyyat axtarışı yerinə, həmçinin bir faylda saxlanılan şifrələrin siyahısını işləmək mümkündür. Beləliklə, proqram sürətli nümunə yükləyicisi və IOC işləyicisi kimi istifadə oluna bilər:
 
 ```bash
 $ python3 python3 vti_search.py -f ./iocs.txt
 ```
 
-The approaches can also be mixed. For instance, you might want to first check the results of a query slightly more in detail, adapt the list of samples in scope, and then re-run the program with the download option enabled for the updated sample list.
+Yanaşmalar həmçinin qarışdırıla bilər. Məsələn, əvvəlcə bir sorğunun nəticələrini bir az daha ətraflı yoxlamaq, hədəf nümunələrinin siyahısını uyğunlaşdırmaq və sonra proqramı yenilənmiş nümunə siyahısı üçün yükləmə seçimi aktivləşdirərək yenidən işlətmək istəyə bilərsiniz.
 
-Alternatively, you might want to combine the results of an Intelligence search with indicators highlighted in a (third-party) report in order to create a more detailed overview of a specific campaign or operation.
+Alternativ olaraq, Kəşfiyyat axtarışının nəticələrini (üçüncü tərəf) hesabatında işarələnmiş göstəricilər ilə birləşdirərək, spesifik bir kampaniya və ya əməliyyat haqqında daha ətraflı bir ümumi baxış yaratmaq istəyə bilərsiniz.
 
-By default, all log files, samples, and reports are stored in a separate directory (identified by its timestamp) that is created at program startup in the `downloads` folder. If you prefer rather updating an existing directory, you can explicitly set the `--download-dir` parameter.
+Əvvəlcədən təyin edilmiş olaraq, bütün jurnal faylları, nümunələr və hesabatlar proqram başladıqda downloads qovluğunda yaradılan ayrıca bir qovluqda (zaman damgası ilə tanınan) saxlanılır. Əgər mövcud bir qovluğu yeniləmək istəyirsinizsə, --download-dir parametrini açıq şəkildə təyin edə bilərsiniz.
 
-For instance, assuming you would like to investigate an APT campaign, you can perform an Intelligence search, retrieve the first 100 results in detailed format, and store all information in a specific folder as follows:
+Məsələn, əgər bir APT kampaniyasını araşdırmaq istəyirsinizsə, Kəşfiyyat axtarışı edə, ilk 100 nəticəni ətraflı formatda əldə edə və bütün məlumatları xüsusi bir qovluqda saxlaya bilərsiniz:
 
 ```bash
 $ python3 vt_search.py -d -q <query> -l 100 -vvv --download-dir=downloads/apt
 ```
 
-## Sample Queries and Intelligence Searches
+Nümunə Axtarışlar və Kəşfiyyat Axtarışları
+Aşağıdakı axtarışlar yalnız proqramın axtarış imkanlarını və mümkün istifadə halları göstərmək məqsədilə nümayiş məqsədli olaraq verilmişdir:
 
-The following queries are solely for demonstration purposes to illustrate search capabilities and possible use cases for the program:
-
-1. Show samples with detection statistics that were submitted after May 1, 2020 and were detected by more than five but less than 10 vendors. 
-
-```bash
+2020-ci ilin 1 mayından sonra təqdim edilən və beşdən çox, amma on vendor tərəfindən aşkarlanan nümunələri göstərin.
+bash
+Kodu kopyala
 $ python3 vti_search.py -q "ls:2020-05-01+ positives:5+ positives:10-" -v --no-behavior
-```
-
-
-2. Show PDF documents in German that were delivered as an email attachment and contain an embedded JavaScript.
-
-```
+Alman dilində olan və email əlavəsi olaraq göndərilən, içində JavaScript yerləşdirilmiş PDF sənədlərini göstərin.
+ruby
+Kodu kopyala
 $ python3 vti_search.py -q "tag:attachment type:pdf lang:german tag:js-embedded"
-```
-
-
-3. Show signed executables with a size of less than 300KB that were detected by more than five vendors.
-
-```bash
+300KB-dən az ölçüsü olan və beşdən çox vendor tərəfindən aşkarlanan imzalanmış icra edilə bilən faylları göstərin.
+bash
+Kodu kopyala
 $ python3 vti_search.py -q "size:300KB- positives:5+ tag:signed type:peexe"
-```
-
-
-4. Show up to five samples, representing Microsoft Office documents that execute code upon opening and likely set an AutoRun key for persistence.
-
-```bash
+Açıldıqda kodu icra edən və davamlılıq üçün AutoRun açarını qurma ehtimalı olan Microsoft Office sənədlərini (beş nümunəyə qədər) göstərin.
+bash
+Kodu kopyala
 $ python3 vti_search.py -q "behavior:'currentversion\run\' type:docx tag:auto-open" -l 5
-```
+Məlumatın İxracı və Əməkdaşlıq
+VTISearch bütün məlumatları CSV formatında ixrac etməyi dəstəkləyir. İxrac olunan məzmunlar, məlumat dərəcəsinin səviyyəsindən asılıdır.
 
+Məsələn, -vvv parametrini təyin edərkən, ətraflı antivirus skanerləmə hesabatları CSV formatında ixrac ediləcək. Digər tərəfdən, yalnız -v parametrini təyin edərkən, daha yüksək səviyyəli xülasə statistikaları yaradılacaq.
 
-## Data Export and Collaboration
-
-*VTISearch* supports exporting all information in CSV format. Exported contents are dependent on the verbosity level.
-
-For instance, when specifying the `-vvv` parameter, detailed anti-virus scanning reports will be exported into CSV format. On the other hand, when solely specifying the `-v` parameter, higher level summary statistics will be created.
-
-The list of network indicators retrieved from dynamic analysis sandbox reports can be exported in CSV format as well. This information can subsequently be loaded with, e.g., [Maltego](https://www.maltego.com/) in order to visualize respective relationships.
+Dinamik analiz sandbox hesabatlarından əldə olunan şəbəkə göstəricilərinin siyahısı da CSV formatında ixrac edilə bilər. Bu məlumat daha sonra, məsələn, Maltego ilə yüklənərək müvafiq əlaqələrin vizuallaşdırılmasını təmin edə bilər.
 
 
 ## Example Run
@@ -268,8 +251,4 @@ Written by Stefan Voemel.
 ```
 
 
-## Comments and Additional Notes
 
-I am not a professional developer or software engineer, and this program should be seen as a small helper tool. While I do enjoy periodically writing smaller utilities in my free time for Incident Response, malware analysis, and Threat Intelligence scenarios, I very rarely upload any of them. 
-
-The only reason why I did so for this program is, because the number of alternatives for the v3 VirusTotal API is currently still very much limited. This being said, I spend the vast majority of my time (i.e., my professional life) with leading security teams and offering strategic advice and guidance on a higher level. As such, if you believe that the code is *\<beep\>*, you are probably right.
